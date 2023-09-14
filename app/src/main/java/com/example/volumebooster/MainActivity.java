@@ -9,8 +9,10 @@ import android.media.audiofx.BassBoost;
 import android.media.audiofx.Equalizer;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,13 +28,14 @@ public class MainActivity extends AppCompatActivity {
     int maxVolume;
     int volumeLevel;
     MediaPlayer mediaPlayer;
-    Equalizer equalizer60,eq;
+    Equalizer equalizer60;
     TextView volBoostTextView;
     TextView volume_Level;
     TextView boost_Level;
     String suffix = "%";
     int audioSessionId;
     BassBoost bassBoost;
+    ToggleButton bassBoost_Btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
         mediaPlayer.setAudioSessionId(AudioManager.AUDIO_SESSION_ID_GENERATE);
         audioSessionId = mediaPlayer.getAudioSessionId();
 
+        bassBoost = new BassBoost(0,audioSessionId);
+
         equalizer60 = new Equalizer(0, audioSessionId);
         equalizer60.setEnabled(true);
 
@@ -61,8 +66,6 @@ public class MainActivity extends AppCompatActivity {
 
         short treble = equalizer60.getBand(3600000);
         short treble1 = equalizer60.getBand(14000000);
-
-
 
         //end
 
@@ -125,7 +128,13 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
 
-                equalizer60.setBandLevel(band60Hz, (short) ((progress - 50) * 100));
+//                equalizer60.setBandLevel(band60Hz, (short) ((progress - 50) * 100));
+                int minBass = equalizer60.getBandLevelRange()[0];
+                int maxBass = equalizer60.getBandLevelRange()[1];
+                int bass = minBass + (progress * (maxBass - minBass)) / seekBar.getMax();
+
+                // Set the bass level for the first Equalizer
+                equalizer60.setBandLevel(band60Hz, (short) bass);
 
             }
 
@@ -144,7 +153,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
 
-                equalizer60.setBandLevel(band230Hz, (short) ((progress - 50) * 100));
+//                equalizer230.setBandLevel(band230Hz, (short) ((progress - 50) * 100));
+
+                int minBass = equalizer60.getBandLevelRange()[0];
+                int maxBass = equalizer60.getBandLevelRange()[1];
+                int bass = minBass + (progress * (maxBass - minBass)) / seekBar.getMax();
+
+                // Set the bass level for the first Equalizer
+                equalizer60.setBandLevel(band230Hz, (short) bass);
+
             }
 
             @Override
@@ -161,7 +178,15 @@ public class MainActivity extends AppCompatActivity {
         seek_Bar_Bass4.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                equalizer60.setBandLevel(band910Hz, (short) ((progress - 50) * 100));
+//                equalizer60.setEnabled(true);
+//                equalizer60.setBandLevel(band910Hz, (short) ((progress - 50) * 100));
+
+                int minBass = equalizer60.getBandLevelRange()[0];
+                int maxBass = equalizer60.getBandLevelRange()[1];
+                int bass = minBass + (progress * (maxBass - minBass)) / seekBar.getMax();
+
+                // Set the bass level for the first Equalizer
+                equalizer60.setBandLevel(band910Hz, (short) bass);
             }
 
             @Override
@@ -175,23 +200,22 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         seek_Bar_Bass5.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
 
                 try {
 
-//                    BassBoost bassBoost = new BassBoost(0, audioSessionId);
-//                    bassBoost.setEnabled(true);
-//                    BassBoost.Settings bassBoostSettingTemp =  bassBoost.getProperties();
-//                    BassBoost.Settings bassBoostSetting = new BassBoost.Settings(bassBoostSettingTemp.toString());
-//                    bassBoostSetting.strength = 1000; // 1000
-//                    bassBoost.setProperties(bassBoostSetting);
-//
-//                    bassBoost.setStrength((short) progress);
+//                    equalizer60.setEnabled(true);
+//                    equalizer60.setBandLevel(treble, (short) ((progress - 50) * 100));
 
-                    equalizer60.setBandLevel(treble, (short) ((progress - 50) * 100));
+
+                    int minBass = equalizer60.getBandLevelRange()[0];
+                    int maxBass = equalizer60.getBandLevelRange()[1];
+                    int bass = minBass + (progress * (maxBass - minBass)) / seekBar.getMax();
+
+                    // Set the bass level for the first Equalizer
+                    equalizer60.setBandLevel(treble, (short) bass);
 
 
 
@@ -213,7 +237,13 @@ public class MainActivity extends AppCompatActivity {
         seek_Bar_Bass2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean b) {
-                equalizer60.setBandLevel(treble1, (short) ((progress - 50) * 100));
+
+                int minBass = equalizer60.getBandLevelRange()[0];
+                int maxBass = equalizer60.getBandLevelRange()[1];
+                int bass = minBass + (progress * (maxBass - minBass)) / seekBar.getMax();
+
+                // Set the bass level for the first Equalizer
+                equalizer60.setBandLevel(treble1, (short) bass);
             }
 
             @Override
@@ -227,9 +257,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        bassBoost_Btn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if(isChecked){
+                    bassBoost.setStrength((short) 1000);
+                    bassBoost.setEnabled(true);
+
+                }else {
+                    bassBoost.setEnabled(false);
+                }
+            }
+        });
+
 
     }
-
 
     @Override
     protected void onDestroy() {
@@ -257,6 +299,7 @@ public class MainActivity extends AppCompatActivity {
         Seek_Bar_VolumeBooster = findViewById(R.id.seek_Bar_BoostVolume);
         volBoostTextView = findViewById(R.id.volBoostTextView);
         volume_Level = findViewById(R.id.volume_Level);
+        bassBoost_Btn = findViewById(R.id.bassBoost_Btn);
 
         audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
