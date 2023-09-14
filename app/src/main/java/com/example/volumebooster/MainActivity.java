@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
         try {
             Seek_Bar_VolumeBooster.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @SuppressLint("SetTextI18n")
@@ -206,17 +207,12 @@ public class MainActivity extends AppCompatActivity {
 
                 try {
 
-//                    equalizer60.setEnabled(true);
-//                    equalizer60.setBandLevel(treble, (short) ((progress - 50) * 100));
-
-
                     int minBass = equalizer60.getBandLevelRange()[0];
                     int maxBass = equalizer60.getBandLevelRange()[1];
                     int bass = minBass + (progress * (maxBass - minBass)) / seekBar.getMax();
 
                     // Set the bass level for the first Equalizer
                     equalizer60.setBandLevel(treble, (short) bass);
-
 
 
                 } catch (IllegalArgumentException e) {
